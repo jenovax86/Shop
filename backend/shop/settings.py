@@ -13,6 +13,8 @@ load_dotenv(BASE_DIR / '.env')
 
 ACCESS_SECRET_KEY = os.environ.get('JWT_ACCESS_TOKEN_SECRET')
 REFRESH_SECRET_KEY = os.environ.get('JWT_REFRESH_TOKEN_SECRET')
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
 
 INSTALLED_APPS = [
     "rest_framework",
@@ -28,8 +30,13 @@ INSTALLED_APPS = [
     "auth",
 ]
 
-MIDDLEWARE = []
+MIDDLEWARE = [
+    "django.contrib.sessions.middleware.SessionMiddleware",
+]
 
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
 ROOT_URLCONF = "shop.urls"
 
 TEMPLATES = []
