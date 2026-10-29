@@ -3,8 +3,9 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from auth.oauth import oauth
 from auth.serializers import LoginSerializer
-from auth.services.login import create_login_session
+from auth.services.login import create_login_session, create_login_oauth_session
 from auth.services.refresh import refresh_session_token
 
 
@@ -30,4 +31,22 @@ class RefreshAPIView(APIView):
         response = Response({"success": True, "tokens": {"access": access_token}},
                             status=status.HTTP_200_OK)
         response.set_cookie("refresh", refresh_token, httponly=True)
+        return response
+
+
+class GoogleLogin(APIView):
+    def get(self, request):
+        redirect_uri = request.build_absolute_uri("/api/v1/auth/google/callback/")
+        return oauth.google.authorize_redirect(request, redirect_uri)
+
+
+class GoogleCallback(APIView):
+    def get(self, request):
+        token = oauth.google.authorize_access_token(request)
+        user_info = token['userinfo']
+        access_token, refresh_token = create_login_oauth_session(userinfo=user_info,
+                                                                 user_agent=request.headers.get('USER-AGENT'))
+        response = Response({"success": True, "tokens": {"access": access_token}},
+                            status=status.HTTP_200_OK)
+        response.set_cookie(key="refresh", value=refresh_token, httponly=True)
         return response
