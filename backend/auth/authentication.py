@@ -15,7 +15,6 @@ class JwtAuthentication(BaseAuthentication):
             return None
 
         payload = decode_access_token(parts[1])
-        print(payload)
 
         session = Session.objects.select_related('user').filter(pk=payload['sid'], user=payload['sub'], revoked_at__isnull=True,
                                          expires_at__gt=timezone.now()).first()
