@@ -11,6 +11,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 load_dotenv(BASE_DIR / '.env')
 
+ACCESS_SECRET_KEY = os.environ.get('JWT_ACCESS_TOKEN_SECRET')
+REFRESH_SECRET_KEY = os.environ.get('JWT_REFRESH_TOKEN_SECRET')
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+
 INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
@@ -21,10 +26,14 @@ INSTALLED_APPS = [
     "addresses",
     "orders",
     "carts",
+    "sessions",
+    "auth",
 ]
 
-MIDDLEWARE = []
 
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SAMESITE = "Lax"
 ROOT_URLCONF = "shop.urls"
 
 TEMPLATES = []
@@ -59,6 +68,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
+    # "EXCEPTION_HANDLER": "core.exception_handler.custom_exception_handler",
     "UNAUTHENTICATED_USER": None,
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",

@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["username", "password", ]
 
     def validate_username(self, value):
-        if "@".lower() in value:
+        if "@"in value:
             raise serializers.ValidationError("Username cannot be email")
         return value
 
@@ -27,13 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
         return super(UserSerializer, self).create(validated_data)
 
     def update(self, instance, validated_data):
-        password = validated_data.pop("password")
+        password = validated_data.pop("password", None)
 
-        if not password:
-            raise serializers.ValidationError("Password cannot be empty.")
+        if password is not None:
+            if check_password(password, instance.password):
+                raise serializers.ValidationError("New password is identical to the old one.")
 
-        if check_password(password, instance.password):
-            raise serializers.ValidationError("New password is identical to the old one.")
-
-        instance.password = make_password(password)
+            instance.password = make_password(password)
         return super(UserSerializer, self).update(instance, validated_data)
