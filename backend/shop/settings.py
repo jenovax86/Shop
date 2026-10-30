@@ -30,9 +30,6 @@ INSTALLED_APPS = [
     "auth",
 ]
 
-MIDDLEWARE = [
-    "django.contrib.sessions.middleware.SessionMiddleware",
-]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
 SESSION_COOKIE_SECURE = False
@@ -71,6 +68,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
+    # "EXCEPTION_HANDLER": "core.exception_handler.custom_exception_handler",
     "UNAUTHENTICATED_USER": None,
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
