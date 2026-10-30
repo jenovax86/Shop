@@ -17,7 +17,7 @@ class SessionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Session.objects.filter(user=self.request.user, deleted_at__isnull=True).order_by('-created_at')
+        return Session.objects.filter(user=self.request.user, revoked_at__isnull=True,  expires_at__gt=timezone.now()).order_by('-created_at')
 
     def get_serializer_class(self):
         if self.action == 'revoke':
