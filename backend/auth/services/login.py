@@ -1,15 +1,16 @@
 from django.db import IntegrityError
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
 from rest_framework.exceptions import AuthenticationFailed
 
-from auth.constants import REFRESH_TOKEN_EXPIRE_TIME
+from auth.constants import REFRESH_TOKEN_LIFETIME
 from auth.services.tokens import sign_jwt_tokens
 from sessions.services.session import create_session
 from users.models import User
 
 
 def create_login_session(user, user_agent):
-    session = create_session(user, user_agent, REFRESH_TOKEN_EXPIRE_TIME)
+    session = create_session(user, user_agent, timezone.now() + REFRESH_TOKEN_LIFETIME)
     access_token, refresh_token = sign_jwt_tokens(user.pk, session.pk)
     return access_token, refresh_token
 

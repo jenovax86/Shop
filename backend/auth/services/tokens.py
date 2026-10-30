@@ -1,9 +1,9 @@
 import jwt
-from datetime import datetime
+from django.utils import timezone
 
 from rest_framework.exceptions import AuthenticationFailed
 
-from auth.constants import ACCESS_TOKEN_EXPIRE_TIME, REFRESH_TOKEN_EXPIRE_TIME
+from auth.constants import ACCESS_TOKEN_LIFETIME, REFRESH_TOKEN_LIFETIME
 from shop import settings
 
 
@@ -11,14 +11,14 @@ def sign_jwt_tokens(sub: str, session_id: str) -> tuple[str, str]:
     access_token_payload = {
         'sub': str(sub),
         'sid': str(session_id),
-        'exp': ACCESS_TOKEN_EXPIRE_TIME,
-        'iat': datetime.now(),
+        'exp': timezone.now() + ACCESS_TOKEN_LIFETIME,
+        'iat': timezone.now(),
     }
     refresh_token_payload = {
         'sub': str(sub),
         'sid': str(session_id),
-        'exp': REFRESH_TOKEN_EXPIRE_TIME,
-        'iat': datetime.now(),
+        'exp': timezone.now() + REFRESH_TOKEN_LIFETIME,
+        'iat': timezone.now(),
     }
     access_token = jwt.encode(access_token_payload, settings.ACCESS_SECRET_KEY, algorithm='HS256')
     refresh_token = jwt.encode(refresh_token_payload, settings.REFRESH_SECRET_KEY, algorithm='HS256')
