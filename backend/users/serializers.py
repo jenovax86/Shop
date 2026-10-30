@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["username", "password", ]
 
     def validate_username(self, value):
-        if "@".lower() in value:
+        if "@"in value:
             raise serializers.ValidationError("Username cannot be email")
         return value
 
