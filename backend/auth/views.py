@@ -22,10 +22,10 @@ class LoginAPIView(APIView):
 
 
 class RefreshAPIView(APIView):
-    def get(self, request):
+    def post(self, request):
         refresh_token = request.COOKIES.get('refresh')
         if not refresh_token:
-            return AuthenticationFailed("There is no refresh token.")
+            raise AuthenticationFailed("There is no refresh token.")
 
         access_token, refresh_token = refresh_session_token(refresh_token)
         response = Response({"success": True, "tokens": {"access": access_token}},
