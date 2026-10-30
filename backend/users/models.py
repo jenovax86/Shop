@@ -16,8 +16,8 @@ class User(models.Model):
 
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=20, unique=True)
-    password = models.CharField(max_length=100)
-    google_identity = models.CharField(max_length=120, blank=True, null=True)
+    password = models.CharField(max_length=128)
+    google_identity = models.CharField(max_length=120, unique=True, blank=True, null=True)
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.USER)
     created_at = models.DateTimeField(db_default=Now())
     updated_at = models.DateTimeField(db_default=Now())
