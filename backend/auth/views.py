@@ -30,7 +30,7 @@ class RefreshAPIView(APIView):
         access_token, refresh_token = refresh_session_token(refresh_token)
         response = Response({"success": True, "tokens": {"access": access_token}},
                             status=status.HTTP_200_OK)
-        response.set_cookie("refresh", refresh_token, httponly=True)
+        response.set_cookie("refresh", refresh_token, httponly=True, secure=True, samesite="Lax")
         return response
 
 
@@ -48,5 +48,5 @@ class GoogleCallback(APIView):
                                                                  user_agent=request.headers.get('USER-AGENT'))
         response = Response({"success": True, "tokens": {"access": access_token}},
                             status=status.HTTP_200_OK)
-        response.set_cookie(key="refresh", value=refresh_token, httponly=True)
+        response.set_cookie(key="refresh", value=refresh_token, httponly=True, secure=True, samesite="Lax")
         return response
