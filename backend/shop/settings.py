@@ -38,6 +38,10 @@ ROOT_URLCONF = "shop.urls"
 
 TEMPLATES = []
 
+MIDDLEWARE = [
+    "django.contrib.sessions.middleware.SessionMiddleware",
+]
+
 WSGI_APPLICATION = "shop.wsgi.application"
 
 DATABASES = {
