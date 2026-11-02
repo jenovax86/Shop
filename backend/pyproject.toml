@@ -16,6 +16,7 @@ dependencies = [
     "authlib (>=1.9.1,<2.0.0)",
     "requests (>=2.34.2,<3.0.0)",
     "djangorestframework-simplejwt (>=5.5.1,<6.0.0)",
+    "ua-parser (>=1.0.2,<2.0.0)",
 ]
 
 [tool.poetry]
