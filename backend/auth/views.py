@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from auth.oauth import oauth
@@ -17,7 +18,8 @@ class LoginAPIView(APIView):
         access_token, refresh_token = create_login_session(user, request.headers.get('USER-AGENT'))
         response = Response({"success": True, "tokens": {"access": access_token}},
                             status=status.HTTP_200_OK)
-        response.set_cookie(key="refresh", value=refresh_token, httponly=True)
+        response.set_cookie(key="refresh", value=refresh_token, httponly=True, secure=True, samesite="Lax",
+                            max_age=int(api_settings.REFRESH_TOKEN_LIFETIME.total_seconds()))
         return response
 
 
@@ -36,7 +38,8 @@ class RefreshAPIView(TokenRefreshView):
         response = Response({"success": True, "tokens": {"access": access_token}},
                             status=status.HTTP_200_OK)
         if new_refresh_token:
-            response.set_cookie(key="refresh", value=new_refresh_token, httponly=True, secure=True, samesite="Lax")
+            response.set_cookie(key="refresh", value=new_refresh_token, httponly=True, secure=True, samesite="Lax",
+                                max_age=int(api_settings.REFRESH_TOKEN_LIFETIME.total_seconds()))
         return response
 
 
@@ -54,5 +57,6 @@ class GoogleCallback(APIView):
                                                                  user_agent=request.headers.get('USER-AGENT'))
         response = Response({"success": True, "tokens": {"access": access_token}},
                             status=status.HTTP_200_OK)
-        response.set_cookie(key="refresh", value=refresh_token, httponly=True, secure=True, samesite="Lax")
+        response.set_cookie(key="refresh", value=refresh_token, httponly=True, secure=True, samesite="Lax",
+                            max_age=int(api_settings.REFRESH_TOKEN_LIFETIME.total_seconds()))
         return response
