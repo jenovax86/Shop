@@ -12,7 +12,6 @@ from users.models import User
 def create_login_session(user, user_agent):
     session = create_session(user, user_agent, timezone.now() + REFRESH_TOKEN_LIFETIME)
     access_token, refresh_token = sign_jwt_tokens(user, session)
-
     return access_token, refresh_token
 
 
