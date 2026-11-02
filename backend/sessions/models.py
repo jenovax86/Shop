@@ -14,3 +14,4 @@ class Session(models.Model):
     revoked_at = models.DateTimeField(null=True, blank=True)
     expires_at = models.DateTimeField()
     user_agent = models.CharField(max_length=255)
+    refresh_jti = models.CharField(max_length=255, unique=True, null=True,blank=True,)

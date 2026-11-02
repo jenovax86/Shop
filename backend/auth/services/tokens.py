@@ -1,46 +1,38 @@
-import jwt
-from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.backends import TokenBackend
 
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import (
+    AccessToken as BaseAccessToken,
+    RefreshToken as BaseRefreshToken,
+)
 
-from auth.constants import ACCESS_TOKEN_LIFETIME, REFRESH_TOKEN_LIFETIME
 from shop import settings
+from users.models import User
 
 
-def sign_jwt_tokens(sub: str, session_id: str) -> tuple[str, str]:
-    access_token_payload = {
-        'sub': str(sub),
-        'sid': str(session_id),
-        'exp': timezone.now() + ACCESS_TOKEN_LIFETIME,
-        'iat': timezone.now(),
-    }
-    refresh_token_payload = {
-        'sub': str(sub),
-        'sid': str(session_id),
-        'exp': timezone.now() + REFRESH_TOKEN_LIFETIME,
-        'iat': timezone.now(),
-    }
-    access_token = jwt.encode(access_token_payload, settings.ACCESS_SECRET_KEY, algorithm='HS256')
-    refresh_token = jwt.encode(refresh_token_payload, settings.REFRESH_SECRET_KEY, algorithm='HS256')
-    return access_token, refresh_token
+def sign_jwt_tokens(user: User, session: str) -> tuple[str, str]:
+    refresh = RefreshToken.for_user(user)
+    refresh["sid"] = session.pk
+    session.refresh_jti = refresh["jti"]
+    session.save(update_fields=["refresh_jti"])
+    return str(refresh.access_token), str(refresh)
 
 
-def decode_jwt_token(token: str, secret_key: str) -> dict:
-    if not token:
-        raise AuthenticationFailed("Token is missing")
-
-    try:
-        return jwt.decode(token, secret_key, algorithms=['HS256'],
-                          options={"require": ["sub", "sid", "exp", "iat"]})
-    except jwt.ExpiredSignatureError as exc:
-        raise AuthenticationFailed(exc)
-    except jwt.InvalidTokenError as exc:
-        raise AuthenticationFailed(exc)
+class AccessToken(BaseAccessToken):
+    def get_token_backend(self):
+        return TokenBackend(
+            algorithm="HS256",
+            signing_key=settings.ACCESS_SECRET_KEY,
+            verifying_key=settings.ACCESS_SECRET_KEY,
+        )
 
 
-def decode_access_token(token: str) -> dict:
-    return decode_jwt_token(token, settings.ACCESS_SECRET_KEY)
+class RefreshToken(BaseRefreshToken):
+    access_token_class = AccessToken
 
-
-def decode_refresh_token(token: str) -> dict:
-    return decode_jwt_token(token, settings.REFRESH_SECRET_KEY)
+    def get_token_backend(self):
+        return TokenBackend(
+            algorithm="HS256",
+            signing_key=settings.REFRESH_SECRET_KEY,
+            verifying_key=settings.REFRESH_SECRET_KEY,
+        )

@@ -1,23 +1,24 @@
 from django.utils import timezone
 from rest_framework import viewsets, mixins, status
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from auth.authentication import JwtAuthentication
+from auth.authentication import SessionJWtAuthentication
 from sessions.models import Session
 from sessions.serializers import SessionSerializer, RevokeSessionSerializer
 
 
 class SessionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = SessionSerializer
-    authentication_classes = [JwtAuthentication]
+    authentication_classes = [SessionJWtAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Session.objects.filter(user=self.request.user, revoked_at__isnull=True,  expires_at__gt=timezone.now()).order_by('-created_at')
+        return Session.objects.filter(user=self.request.user, revoked_at__isnull=True,
+                                      expires_at__gt=timezone.now()).order_by('-created_at')
 
     def get_serializer_class(self):
         if self.action == 'revoke':

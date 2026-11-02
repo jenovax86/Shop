@@ -1,12 +1,9 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models.functions import Now
 
 
-class User(models.Model):
-    @property
-    def is_authenticated(self):
-        return True
-
+class User(AbstractUser):
     class Meta:
         db_table = 'users'
 

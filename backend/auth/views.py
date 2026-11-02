@@ -2,11 +2,11 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from auth.oauth import oauth
-from auth.serializers import LoginSerializer
+from auth.serializers import LoginSerializer, RefreshSerializer
 from auth.services.login import create_login_session, create_login_oauth_session
-from auth.services.refresh import refresh_session_token
 
 
 class LoginAPIView(APIView):
@@ -21,16 +21,22 @@ class LoginAPIView(APIView):
         return response
 
 
-class RefreshAPIView(APIView):
+class RefreshAPIView(TokenRefreshView):
+    serializer_class = RefreshSerializer
+
     def post(self, request):
         refresh_token = request.COOKIES.get('refresh')
         if not refresh_token:
             raise AuthenticationFailed("There is no refresh token.")
 
-        access_token, refresh_token = refresh_session_token(refresh_token)
+        serializer = self.get_serializer(data={"refresh": refresh_token})
+        serializer.is_valid(raise_exception=True)
+        access_token = serializer.validated_data['access']
+        new_refresh_token = serializer.validated_data.get('refresh')
         response = Response({"success": True, "tokens": {"access": access_token}},
                             status=status.HTTP_200_OK)
-        response.set_cookie("refresh", refresh_token, httponly=True, secure=True, samesite="Lax")
+        if new_refresh_token:
+            response.set_cookie(key="refresh", value=new_refresh_token, httponly=True, secure=True, samesite="Lax")
         return response
 
 

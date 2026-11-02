@@ -1,6 +1,8 @@
 import os
+from datetime import timedelta
 from pathlib import Path
 
+from django.conf.global_settings import AUTH_USER_MODEL
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,11 +17,14 @@ ACCESS_SECRET_KEY = os.environ.get('JWT_ACCESS_TOKEN_SECRET')
 REFRESH_SECRET_KEY = os.environ.get('JWT_REFRESH_TOKEN_SECRET')
 GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+ACCESS_TOKEN_LIFETIME = timedelta(minutes=10)
+REFRESH_TOKEN_LIFETIME = timedelta(days=1)
 
 INSTALLED_APPS = [
     "rest_framework",
     "django_filters",
     "django.contrib.contenttypes",
+    "django.contrib.auth",
     "users",
     "categories",
     "products",
@@ -27,10 +32,10 @@ INSTALLED_APPS = [
     "orders",
     "carts",
     "sessions",
-    "auth",
+    "auth.apps.AuthConfig",
 ]
 
-
+AUTH_USER_MODEL = "users.User"
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_SAMESITE = "Lax"
@@ -72,9 +77,28 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
-    # "EXCEPTION_HANDLER": "core.exception_handler.custom_exception_handler",
     "UNAUTHENTICATED_USER": None,
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
+}
+
+SIMPLE_JWT = {
+    "UPDATE_LAST_LOGIN": False,
+    "ACCESS_TOKEN_LIFETIME": ACCESS_TOKEN_LIFETIME,
+    "REFRESH_TOKEN_LIFETIME": REFRESH_TOKEN_LIFETIME,
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "ALGORITHM": "HS256",
+
+    "AUTH_TOKEN_CLASSES": [
+        "auth.services.tokens.AccessToken",
     ],
+    "TOKEN_REFRESH_SERIALIZER": [
+      "auth.serializers.RefreshSerializer",
+    ],
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "sub",
+    "ON_LOGIN_SUCCESS": "rest_framework_simplejwt.serializers.default_on_login_success",
+    "ON_LOGIN_FAILED": "rest_framework_simplejwt.serializers.default_on_login_failed",
+    "JTI_CLAIM": "jti",
+
 }
