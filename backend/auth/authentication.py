@@ -9,7 +9,6 @@ from sessions.models import Session
 class SessionJWtAuthentication(JWTAuthentication):
     def authenticate(self, request):
         result = super(SessionJWtAuthentication, self).authenticate(request)
-        print(result)
         if result is None:
             return None
 
