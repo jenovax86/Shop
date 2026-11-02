@@ -79,7 +79,7 @@ REST_FRAMEWORK = {
     ],
     "UNAUTHENTICATED_USER": None,
     "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRenderer",
+        "core.renderers.CustomJSONRenderer",
     ],
 }
 

@@ -1,8 +1,9 @@
 from django.db import IntegrityError
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
-from rest_framework.exceptions import AuthenticationFailed
 
+from auth.exceptions import AuthenticationFailed
+from sessions.exceptions import AccountNotFound
 from shop.settings import REFRESH_TOKEN_LIFETIME
 from auth.services.tokens import sign_jwt_tokens
 from sessions.services.session import create_session
@@ -28,6 +29,6 @@ def create_login_oauth_session(userinfo, user_agent):
         raise AuthenticationFailed('Username already in use')
 
     if user.deleted_at is not None:
-        raise AuthenticationFailed("Account has been deleted.")
+        raise AccountNotFound("Account not found or may be deleted.")
 
     return create_login_session(user, user_agent)

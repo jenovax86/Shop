@@ -7,7 +7,7 @@ class TokenExpired(AbstractException):
     status_code = status.HTTP_404_NOT_FOUND
     error_code = "Token expired"
 
-class TokenInvalid(AbstractException):
+class InvalidToken(AbstractException):
     status_code = status.HTTP_404_NOT_FOUND
     error_code = "Token invalid"
 

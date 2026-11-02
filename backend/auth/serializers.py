@@ -42,7 +42,6 @@ class RefreshSerializer(TokenRefreshSerializer):
             raise AuthenticationFailed("Session expired or revoked")
 
         data = super(RefreshSerializer, self).validate(attrs)
-        print(data)
         if "refresh" in data:
             new_refresh = self.token_class(data["refresh"])
             session.refresh = new_refresh['jti']

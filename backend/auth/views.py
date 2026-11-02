@@ -1,10 +1,10 @@
 from rest_framework import status
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.settings import api_settings
 from rest_framework_simplejwt.views import TokenRefreshView
 
+from auth.exceptions import AuthenticationFailed
 from auth.oauth import oauth
 from auth.serializers import LoginSerializer, RefreshSerializer
 from auth.services.login import create_login_session, create_login_oauth_session
