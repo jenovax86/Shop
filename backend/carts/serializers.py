@@ -4,12 +4,10 @@ from carts.models import Carts
 
 
 class CartsSerializer(serializers.ModelSerializer):
+    quantity = serializers.IntegerField(min_value=1)
+
     class Meta:
         model = Carts
-        fields = ["user", "product", "quantity",]
+        fields = ["user", "product", "quantity", ]
         read_only_fields = ["user", ]
 
-        def validate_quantity(self, value):
-            if value < 0:
-                raise serializers.ValidationError("Quantity must be greater than zero.")
-            return value
