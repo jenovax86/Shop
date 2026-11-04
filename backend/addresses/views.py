@@ -1,5 +1,6 @@
 from django.utils import timezone
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 from addresses.models import Address
 from addresses.serializers import AddressSerializer
@@ -8,6 +9,10 @@ from addresses.serializers import AddressSerializer
 class AddressViewSet(viewsets.ModelViewSet):
     queryset = Address.objects.filter(deleted_at__isnull=True)
     serializer_class = AddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def perform_destroy(self, instance):
         instance.deleted_at = timezone.now()

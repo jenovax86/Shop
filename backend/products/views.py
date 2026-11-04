@@ -1,5 +1,6 @@
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_extensions.bulk_operations.mixins import ListUpdateModelMixin, ListDestroyModelMixin
 from rest_framework import viewsets
 from rest_framework.pagination import CursorPagination
@@ -7,6 +8,7 @@ from rest_framework.pagination import CursorPagination
 from products.filters import ProductFilter
 from products.models import Product
 from products.serializers import ProductSerializer
+from users.permissions import  IsAdminOrReadOnly
 
 
 class ProductCursorPagination(CursorPagination):
@@ -21,6 +23,7 @@ class ProductViewSet(ListUpdateModelMixin, ListDestroyModelMixin, viewsets.Model
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductFilter
     pagination_class = ProductCursorPagination
+    permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
 
     def perform_destroy(self, instance):
         instance.deleted_at = timezone.now()
