@@ -6,14 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from auth.authentication import SessionJWtAuthentication
 from sessions.models import Session
 from sessions.serializers import SessionSerializer, RevokeSessionSerializer
 
 
 class SessionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = SessionSerializer
-    authentication_classes = [SessionJWtAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
