@@ -1,6 +1,5 @@
 from authlib.oauth2.rfc8628 import ExpiredTokenError
 from django.utils import timezone
-from jwt import InvalidTokenError
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import (
@@ -13,7 +12,7 @@ from sessions.exceptions import SessionNotFound, SessionRevoked, InvalidSessionT
 from sessions.models import Session
 
 
-class SessionJWtAuthentication(JWTAuthentication):
+class SessionJwtAuthentication(JWTAuthentication):
     def get_validated_token(self, raw_token):
         try:
             return AccessToken(raw_token)
@@ -23,7 +22,7 @@ class SessionJWtAuthentication(JWTAuthentication):
             raise InvalidToken("Invalid token exception")
 
     def authenticate(self, request):
-        result = super(SessionJWtAuthentication, self).authenticate(request)
+        result = super(SessionJwtAuthentication, self).authenticate(request)
         if result is None:
             return None
 
