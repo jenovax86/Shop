@@ -32,8 +32,9 @@ class Order(models.Model):
 class OrderProduct(models.Model):
     class Meta:
         db_table = "orders_products"
+        models.UniqueConstraint(fields=['order', 'product'], name='order_product_unique')
 
-    pk = models.CompositePrimaryKey('order_id', 'product_id')
+    id = models.AutoField(primary_key=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
