@@ -34,6 +34,8 @@ def create_order(user, serializer):
                 product=item.product,
                 quantity=item.quantity,
                 price=item.product.price,
+                size=item.product.size,
+                color=item.product.color,
             )
             for item in cart_items
         ])
