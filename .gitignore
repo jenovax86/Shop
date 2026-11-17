@@ -7,7 +7,7 @@ __pycache__/
 *.so
 .idea
 backend/.idea
-backend/.env
+
 # Distribution / packaging
 .Python
 build/
@@ -153,6 +153,7 @@ activemq-data/
 
 # Environments
 .env
+backend/.env
 .envrc
 .venv
 env/
@@ -161,6 +162,7 @@ ENV/
 env.bak/
 venv.bak/
 
+.DS_Store
 # Spyder project settings
 .spyderproject
 .spyproject
