@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("categories", "0002_alter_category_name"),
         ("products", "0001_initial"),

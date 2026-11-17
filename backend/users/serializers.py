@@ -1,15 +1,17 @@
 from django.contrib.auth.hashers import make_password
-from rest_framework import serializers
+from rest_framework_json_api import serializers
 
 from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=100, write_only=True)
+    url = serializers.HyperlinkedIdentityField(view_name="user-detail")
+    password = serializers.CharField(max_length=100, write_only=True, trim_whitespace=False)
 
     class Meta:
         model = User
-        fields = ["username", "password", ]
+        fields = ["id", "url", "username", "password", "email", "first_name", "last_name"]
+        read_only_fields = ["id"]
 
     def validate_username(self, value):
         if "@" in value:
@@ -35,3 +37,11 @@ class UserSerializer(serializers.ModelSerializer):
 
             instance.set_password(password)
         return super(UserSerializer, self).update(instance, validated_data)
+
+
+class AdminUserSerializer(UserSerializer):
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + [
+            "role", "is_active", "is_staff", "is_superuser",
+            "google_identity", "deleted_at",
+        ]

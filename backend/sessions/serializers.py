@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework_json_api import serializers
 
 from sessions.models import Session
 from sessions.utils import parse_user_agent
@@ -7,16 +7,19 @@ from sessions.utils import parse_user_agent
 class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
-        fields = ['id', 'revoked_at', 'created_at', 'expires_at', 'user_agent', 'device_info',]
-        read_only_fields = ['revoked_at', 'created_at', 'expires_at', 'user_agent', 'device_info',]
+        fields = ['id', 'user', 'revoked_at', 'created_at', 'expires_at', 'user_agent', 'device_info', ]
+        read_only_fields = ['user', 'revoked_at', 'created_at', 'expires_at', 'user_agent', 'device_info', ]
 
     device_info = serializers.SerializerMethodField()
 
-    def get_device_info(self, value):
+    def get_device_info(self, value) -> dict:
         return parse_user_agent(value.user_agent)
 
 
 class RevokeSessionSerializer(serializers.Serializer):
+    class JSONAPIMeta:
+        resource_name = "session-revocations"
+
     session_ids = serializers.ListField(
         child=serializers.IntegerField(min_value=1),
         allow_empty=False,

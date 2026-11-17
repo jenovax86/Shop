@@ -1,19 +1,19 @@
-from django.utils import timezone
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 
 from addresses.models import Address
 from addresses.serializers import AddressSerializer
+from core.pagination import JSONAPIPagination
+from users.mixins import OwnerQuerysetMixin
+from users.permissions import IsAdminOrOwner
 
 
-class AddressViewSet(viewsets.ModelViewSet):
-    queryset = Address.objects.filter(deleted_at__isnull=True)
+class AddressPagination(JSONAPIPagination):
+    page_size = 10
+    ordering = '-id'
+
+
+class AddressViewSet(OwnerQuerysetMixin, viewsets.ModelViewSet):
+    queryset = Address.objects.all()
     serializer_class = AddressSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def perform_destroy(self, instance):
-        instance.deleted_at = timezone.now()
-        instance.save(update_fields=['deleted_at'])
+    pagination_class = AddressPagination
+    permission_classes = [IsAdminOrOwner]

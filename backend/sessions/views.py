@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from users.permissions import is_admin
 from sessions.models import Session
 from sessions.serializers import SessionSerializer, RevokeSessionSerializer
 
@@ -15,8 +16,12 @@ class SessionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Session.objects.filter(user=self.request.user, revoked_at__isnull=True,
-                                      expires_at__gt=timezone.now()).order_by('-created_at')
+        queryset = Session.objects.all().order_by("-created_at")
+        if getattr(self, "swagger_fake_view", False):
+            return queryset.none()
+        if is_admin(self.request.user):
+            return queryset
+        return queryset.filter(user=self.request.user, revoked_at__isnull=True, expires_at__gt=timezone.now())
 
     def get_serializer_class(self):
         if self.action == 'revoke':
@@ -29,17 +34,18 @@ class SessionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         revoked_sessions = self.get_queryset().filter(pk__in=serializer.validated_data['session_ids'],
                                                       revoked_at__isnull=True).update(revoked_at=timezone.now())
-        return Response({'revoked_sessions': revoked_sessions})
+        return Response({'meta': {'revoked_sessions': revoked_sessions}})
 
     @action(detail=False, methods=['post'])
     def logout(self, request):
         payload = request.auth
 
-        if not payload['sid']:
+        if payload is None or not payload.get('sid'):
             raise AuthenticationFailed("invalid session token.")
 
-        self.get_queryset().filter(pk=payload['sid'], revoked_at__isnull=True).update(revoked_at=timezone.now())
-        response = Response(status=status.HTTP_200_OK)
+        self.get_queryset().filter(pk=payload['sid'], user=request.user, revoked_at__isnull=True).update(
+            revoked_at=timezone.now())
+        response = Response(status=status.HTTP_204_NO_CONTENT)
         response.delete_cookie('refresh')
 
         return response

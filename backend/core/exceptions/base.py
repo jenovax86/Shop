@@ -14,4 +14,3 @@ class AbstractException(Exception):
 class NotFoundException(AbstractException):
     status_code = status.HTTP_404_NOT_FOUND
     error_code = "NOT_FOUND"
-

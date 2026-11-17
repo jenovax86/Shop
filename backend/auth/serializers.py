@@ -1,50 +1,37 @@
-from django.contrib.auth import authenticate
-from django.utils import timezone
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
-from rest_framework_simplejwt.serializers import TokenRefreshSerializer
-
-from auth.services.tokens import RefreshToken
-from sessions.models import Session
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
-class LoginSerializer(serializers.Serializer):
+class RegisterSerializer(serializers.Serializer):
+    class JSONAPIMeta:
+        resource_name = "users"
+
     username = serializers.CharField(max_length=20, required=True)
-    password = serializers.CharField(max_length=100, required=True)
-
-    def validate(self, attrs):
-        user = authenticate(username=attrs["username"], password=attrs["password"])
-
-        if user is None:
-            raise serializers.ValidationError("Invalid username or password.")
-
-        attrs['user'] = user
-        return attrs
+    password = serializers.CharField(max_length=100, min_length=6, required=True)
 
 
-class RefreshSerializer(TokenRefreshSerializer):
-    token_class = RefreshToken
+class LoginSerializer(TokenObtainPairSerializer):
+    class JSONAPIMeta:
+        resource_name = "tokens"
 
-    def validate(self, attrs):
-        refresh = self.token_class(attrs["refresh"])
-        user_id = refresh.payload.get(api_settings.USER_ID_CLAIM)
-        session_id = refresh.payload.get("sid")
 
-        if not user_id or not session_id:
-            raise AuthenticationFailed("Invalid refresh token.")
+class RefreshSerializer(serializers.Serializer):
+    class JSONAPIMeta:
+        resource_name = "tokens"
 
-        session = Session.objects.filter(pk=session_id, user=user_id, refresh_jti=refresh["jti"],
-                                         user__deleted_at__isnull=True,
-                                         revoked_at__isnull=True,
-                                         expires_at__gte=timezone.now()).first()
-        if session is None:
-            raise AuthenticationFailed("Session expired or revoked")
+    refresh = serializers.CharField()
 
-        data = super(RefreshSerializer, self).validate(attrs)
-        if "refresh" in data:
-            new_refresh = self.token_class(data["refresh"])
-            session.refresh = new_refresh['jti']
-            session.save(update_fields=["refresh_jti"])
+    def validate_refresh(self, value):
+        try:
+            refresh = RefreshToken(value)
+        except TokenError as exc:
+            raise InvalidToken(str(exc)) from exc
 
-        return data
+        user_id = refresh.get(api_settings.USER_ID_CLAIM)
+        session_id = refresh.get("sid")
+        if not user_id or not isinstance(session_id, int) or isinstance(session_id, bool) or session_id < 1:
+            raise InvalidToken("Invalid refresh token session.")
+        return refresh

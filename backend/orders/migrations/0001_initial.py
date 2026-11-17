@@ -7,7 +7,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -24,12 +23,15 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=10)),
                 ('discounted_price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('state', models.CharField(choices=[('active', 'Active'), ('pending', 'Pending'), ('shipped', 'Shipped'), ('delivered', 'Delivered')], max_length=10)),
+                ('state', models.CharField(
+                    choices=[('active', 'Active'), ('pending', 'Pending'), ('shipped', 'Shipped'),
+                             ('delivered', 'Delivered')], max_length=10)),
                 ('created_at', models.DateTimeField(db_default=django.db.models.functions.datetime.Now())),
                 ('updated_at', models.DateTimeField(db_default=django.db.models.functions.datetime.Now())),
                 ('deleted_at', models.DateTimeField(blank=True, null=True)),
                 ('address', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='addresses.address')),
-                ('coupon', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='coupons.coupon')),
+                ('coupon', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                             to='coupons.coupon')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -42,8 +44,14 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('quantity', models.IntegerField(default=1)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('size', models.CharField(choices=[('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('XL', 'XL'), ('XXL', 'XXL'), ('XXXL', 'XXXL'), ('XXXXL', 'XXXXL')], max_length=15)),
-                ('color', models.CharField(choices=[('red', 'Red'), ('green', 'Green'), ('blue', 'Blue'), ('yellow', 'Yellow'), ('white', 'White'), ('black', 'Black'), ('gray', 'Gray'), ('brown', 'Brown'), ('purple', 'Purple'), ('orange', 'Orange'), ('pink', 'Pink'), ('beige', 'Beige'), ('navy', 'Navy'), ('olive', 'Olive')], max_length=15)),
+                ('size', models.CharField(
+                    choices=[('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('XL', 'XL'), ('XXL', 'XXL'),
+                             ('XXXL', 'XXXL'), ('XXXXL', 'XXXXL')], max_length=15)),
+                ('color', models.CharField(
+                    choices=[('red', 'Red'), ('green', 'Green'), ('blue', 'Blue'), ('yellow', 'Yellow'),
+                             ('white', 'White'), ('black', 'Black'), ('gray', 'Gray'), ('brown', 'Brown'),
+                             ('purple', 'Purple'), ('orange', 'Orange'), ('pink', 'Pink'), ('beige', 'Beige'),
+                             ('navy', 'Navy'), ('olive', 'Olive')], max_length=15)),
                 ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='orders.order')),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.product')),
             ],

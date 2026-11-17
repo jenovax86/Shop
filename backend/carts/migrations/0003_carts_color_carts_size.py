@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('carts', '0002_carts_quantity'),
     ]
@@ -13,13 +12,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='carts',
             name='color',
-            field=models.CharField(choices=[('red', 'Red'), ('green', 'Green'), ('blue', 'Blue'), ('yellow', 'Yellow'), ('white', 'White'), ('black', 'Black'), ('gray', 'Gray'), ('brown', 'Brown'), ('purple', 'Purple'), ('orange', 'Orange'), ('pink', 'Pink'), ('beige', 'Beige'), ('navy', 'Navy'), ('olive', 'Olive')], default='black', max_length=15),
+            field=models.CharField(
+                choices=[('red', 'Red'), ('green', 'Green'), ('blue', 'Blue'), ('yellow', 'Yellow'), ('white', 'White'),
+                         ('black', 'Black'), ('gray', 'Gray'), ('brown', 'Brown'), ('purple', 'Purple'),
+                         ('orange', 'Orange'), ('pink', 'Pink'), ('beige', 'Beige'), ('navy', 'Navy'),
+                         ('olive', 'Olive')], default='black', max_length=15),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='carts',
             name='size',
-            field=models.CharField(choices=[('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('XL', 'XL'), ('XXL', 'XXL'), ('XXXL', 'XXXL'), ('XXXXL', 'XXXXL')], default='black', max_length=15),
+            field=models.CharField(
+                choices=[('small', 'Small'), ('medium', 'Medium'), ('large', 'Large'), ('XL', 'XL'), ('XXL', 'XXL'),
+                         ('XXXL', 'XXXL'), ('XXXXL', 'XXXXL')], default='black', max_length=15),
             preserve_default=False,
         ),
     ]
