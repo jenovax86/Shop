@@ -7,6 +7,7 @@ __pycache__/
 *.so
 .idea
 backend/.idea
+backend/.env
 # Distribution / packaging
 .Python
 build/
