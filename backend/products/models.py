@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models.functions import Now
+from pathlib import Path
+import uuid
 
 from categories.models import Category
 
@@ -47,3 +49,18 @@ class Product(models.Model):
     created_at = models.DateTimeField(db_default=Now())
     updated_at = models.DateTimeField(db_default=Now())
     deleted_at = models.DateTimeField(null=True, blank=True)
+
+
+class ProductMedia(models.Model):
+    class Meta:
+        db_table = "product_media"
+
+    def upload_path(instance, filename):
+        extension = Path(filename).suffix().lower()
+        return (
+            f"products/{instance.product.id}/"
+            f"media/{uuid.uuid4().hex}{extension}/"
+        )
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to=upload_path, width_field="width", height_field="height")

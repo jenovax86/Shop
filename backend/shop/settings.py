@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "sessions",
     "coupons",
     "auth.apps.AuthConfig",
+    "storages",
 ]
 
 AUTH_USER_MODEL = "users.User"
@@ -152,5 +153,25 @@ SPECTACULAR_SETTINGS = {
             "refreshCookie": {"type": "apiKey", "in": "cookie", "name": "refresh",
                               "description": "HTTP-only refresh JWT set by login. Browser requests use the cookie automatically on same-origin HTTPS."},
         },
+    },
+}
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "access_key": os.getenv("AWS_S3_ACCESS_KEY"),
+            "secret_key": os.getenv("AWS_S3_SECRET_ACCESS_KEY"),
+            "bucket_name": os.getenv("AWS_S3_STORAGE_BUCKET_NAME"),
+            "region_name": os.getenv("AWS_S3_REGION_NAME"),
+            "default_acl": None,
+            "file_overwrite": False,
+            "querystring_auth": True,
+            "querystring_expire": 3600,
+            "location": "media",
+        }
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
