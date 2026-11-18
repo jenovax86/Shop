@@ -15,6 +15,9 @@ class IsAdminOrOwner(BasePermission):
         return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
+        if hasattr(obj, "cart_id"):
+            return obj.cart.user_id == request.user.pk
+
         return is_admin(request.user) or obj.user_id == request.user.pk
 
 
