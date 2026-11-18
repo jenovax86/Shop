@@ -37,3 +37,23 @@ class CartItemsSerializer(serializers.ModelSerializer):
             self.fields["cart"].queryset = Carts.objects.filter(
                 user=request.user
             )
+
+    def validate(self, attrs):
+        errors = {}
+        product = attrs.get("product", getattr(self.instance, "product", None))
+        color = attrs.get("color", getattr(self.instance, "color", None))
+        size = attrs.get("size", getattr(self.instance, "size", None))
+
+        if product is None:
+            return attrs
+
+        if color is not None and product.color != color:
+            errors["color"] = "This product is not available in this color."
+
+        if size is not None and size != product.size:
+            errors["size"] = "This product is not available in this size."
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
