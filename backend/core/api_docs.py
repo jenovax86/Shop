@@ -171,7 +171,6 @@ class AddressDocumentation(OpenApiViewExtension):
 
         )(Documented)
 
-
 class CartDocumentation(OpenApiViewExtension):
     target_class = "carts.views.CartsViewSet"
 
@@ -218,8 +217,8 @@ class CartDocumentation(OpenApiViewExtension):
         )(Documented)
 
 
-class CartDocumentation(OpenApiViewExtension):
-    target_class = "categories.views.CategoryViewSet"
+class ProductMediaDocumentation(OpenApiViewExtension):
+    target_class = "products.views.ProductMediaViewSet"
 
     def view_replacement(self):
         class Documented(self.target_class):
@@ -227,39 +226,39 @@ class CartDocumentation(OpenApiViewExtension):
 
         return extend_schema_view(
             list=extend_schema(
-                tags=["Categories"],
-                summary="Get Categories",
-                description="Retrieve a list of Categories."
+                tags=["Product Media"],
+                summary="Get Product Media",
+                description="Retrieve a list of product media."
             ),
 
             create=extend_schema(
-                tags=["Categories"],
-                summary="Create Category",
-                description="Create a new Category."
+                tags=["Product Media"],
+                summary="Upload Product Media",
+                description="Upload one or more images for a product."
             ),
 
             retrieve=extend_schema(
-                tags=["Categories"],
-                summary="Get single Category",
-                description="Retrieve details of a specific Category."
+                tags=["Product Media"],
+                summary="Get Product Media Details",
+                description="Retrieve details of a specific product media."
             ),
 
             update=extend_schema(
-                tags=["Categories"],
-                summary="Update Category",
-                description="Replace an existing Category using PUT."
+                tags=["Product Media"],
+                summary="Update Product Media",
+                description="Replace an existing product media using PUT."
             ),
 
             partial_update=extend_schema(
-                tags=["Categories"],
-                summary="Partially update Category",
-                description="Update specific fields of an existing Category using PATCH."
+                tags=["Product Media"],
+                summary="Partially Update Product Media",
+                description="Update specific fields of an existing product media using PATCH."
             ),
 
             destroy=extend_schema(
-                tags=["Categories"],
-                summary="Delete a Category",
-                description="Delete an existing Category."
+                tags=["Product Media"],
+                summary="Delete Product Media",
+                description="Delete an existing product media."
             ),
         )(Documented)
 

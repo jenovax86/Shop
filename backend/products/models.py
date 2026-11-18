@@ -56,11 +56,12 @@ class ProductMedia(models.Model):
         db_table = "product_media"
 
     def upload_path(instance, filename):
-        extension = Path(filename).suffix().lower()
+        extension = Path(filename).suffix.lower()
+
         return (
-            f"products/{instance.product.id}/"
-            f"media/{uuid.uuid4().hex}{extension}/"
+            f"products/{instance.product_id}/"
+            f"media/{uuid.uuid4().hex}{extension}"
         )
 
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to=upload_path, width_field="width", height_field="height")
+    image = models.ImageField(upload_to=upload_path)
