@@ -8,14 +8,6 @@ from users.permissions import IsAdminOrReadOnly
 
 
 class CouponsViewSet(OwnerQuerysetMixin, viewsets.ModelViewSet):
-    """Users may read only coupons assigned to them. Creation, updates and deletion require an administrator."""
     queryset = Coupon.objects.all()
     serializer_class = CouponSerializer
     permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
-
-    def perform_create(self, serializer):
-        coupon = serializer.save()
-        coupon.refresh_from_db(fields=["created_at"])
-
-    def perform_destroy(self, instance):
-        instance.delete()

@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework_json_api import serializers
 
 from coupons.models import Coupon
+from users.models import User
 
 
 class CouponSerializer(serializers.ModelSerializer):
@@ -12,36 +13,29 @@ class CouponSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Coupon
-        fields = ["id", "url", "user", "code", "percentage", "duration", "duration_days", "expires_at", "is_active",
-                  "used_at",
-                  "created_at", ]
+        fields = ["id", "url", "user", "code", "percentage", "duration_days", "expires_at", ]
         read_only_fields = [
             "id",
-            "created_at",
             "expires_at",
             "code",
-            "duration"
         ]
 
+    user = serializers.ResourceRelatedField(
+        queryset=User.objects.all()
+    )
     duration_days = serializers.IntegerField(write_only=True, min_value=1, required=False)
-    duration = serializers.DurationField(read_only=True)
 
-    def create(self, value):
-        days = value.pop("duration_days", 3)
-        value["duration"] = timedelta(days=days)
-        return super(CouponSerializer, self).create(value)
+    def create(self, validated_data):
+        days = validated_data.pop("duration_days")
+        validated_data["expires_at"] = (
+                timezone.now() + timedelta(days=days)
+        )
+        return super(CouponSerializer, self).create(validated_data)
 
     def update(self, instance, validated_data):
         days = validated_data.pop("duration_days", None)
         if days is not None:
-            validated_data["duration"] = timedelta(days=days)
-            validated_data["expires_at"] = timezone.now() + timedelta(days=days)
-        return super().update(instance, validated_data)
-
-    def validate_percentage(self, value):
-        if not Decimal("0") < value <= Decimal("100"):
-            raise serializers.ValidationError(
-                "Percentage must be between 0 and 100."
+            validated_data["expires_at"] = (
+                    timezone.now() + timedelta(days=days)
             )
-
-        return value
+        return super().update(instance, validated_data)

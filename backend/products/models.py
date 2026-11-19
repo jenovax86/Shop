@@ -45,6 +45,7 @@ class Product(models.Model):
     name = models.CharField(max_length=50)
     size = models.CharField(max_length=15, choices=Sizes.choices)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     color = models.CharField(max_length=15, choices=Colors.choices)
     created_at = models.DateTimeField(db_default=Now())
     updated_at = models.DateTimeField(db_default=Now())

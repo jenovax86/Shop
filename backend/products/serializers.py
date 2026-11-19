@@ -9,12 +9,23 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id", "url", "gender", "category", "name", "size", "price", "color"]
+        fields = ["id", "url", "gender", "category", "name", "size", "price", "color", "discounted_price", ]
 
-    def validate_price(self, value):
-        if value < 0:
-            raise serializers.ValidationError("Price must be greater than zero.")
-        return value
+    def validate(self, attrs):
+        price = attrs.get("price", getattr(self.instance, "price", None))
+        discounted_price = attrs.get("discounted_price", getattr(self.instance, "discounted_price", None))
+
+        if price is None:
+            return attrs
+
+        if discounted_price is None:
+            return attrs
+
+        if discounted_price > price:
+            raise serializers.ValidationError({
+                "discount_price": "Discount price cannot exceed the original price."
+            })
+        return attrs
 
 
 class ProductMediaSerializer(serializers.ModelSerializer):
